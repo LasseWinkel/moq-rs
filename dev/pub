@@ -34,15 +34,20 @@ NAME="${NAME:-bbb}"
 URL="${URL:-"$SCHEME://$ADDR"}"
 
 # Default to a source video
-INPUT="${INPUT:-dev/bbb.mp4}"
+INPUT="${INPUT:-/dev/video0}"
 
 # Print out the watch URL
 echo "Watch URL: https://quic.video/watch/$NAME?server=$ADDR"
 
 # Run ffmpeg and pipe the output to moq-pub
-ffmpeg -hide_banner -v quiet \
+ffmpeg -hide_banner \
 	-stream_loop -1 -re \
 	-i "$INPUT" \
 	-c copy \
 	-f mp4 -movflags cmaf+separate_moof+delay_moov+skip_trailer+frag_every_frame \
+	-c:v libx264 \
+	-tune zerolatency \
 	- | cargo run --bin moq-pub -- --name "$NAME" "$URL" "$@"
+
+	# -vf "drawtext=fontsize=42:fontcolor=red:text='%{localtime\:%X.%N}      %{pts\:hms}     %{frame_num}':x=20:y=20" \
+	# -metadata:s:v:0 "key1=value1:key2=value2" \
