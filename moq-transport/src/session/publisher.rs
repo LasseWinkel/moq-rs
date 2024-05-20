@@ -1,6 +1,8 @@
 use std::{
 	collections::{hash_map, HashMap},
 	sync::{Arc, Mutex},
+	process::Command,
+	path::Path
 };
 
 use futures::{stream::FuturesUnordered, StreamExt};
@@ -109,6 +111,9 @@ impl Publisher {
 			message::Subscriber::AnnounceCancel(msg) => self.recv_announce_cancel(msg),
 			message::Subscriber::Subscribe(msg) => self.recv_subscribe(msg),
 			message::Subscriber::Unsubscribe(msg) => self.recv_unsubscribe(msg),
+			message::Subscriber::Throttle(msg) => self.recv_throttle(msg),
+			message::Subscriber::PacketLoss(msg) => self.recv_packet_loss(msg),
+			message::Subscriber::TcReset(msg) => self.recv_tc_reset(msg),
 		};
 
 		if let Err(err) = res {
@@ -178,6 +183,62 @@ impl Publisher {
 	fn recv_unsubscribe(&mut self, msg: message::Unsubscribe) -> Result<(), SessionError> {
 		if let Some(subscribed) = self.subscribed.lock().unwrap().get_mut(&msg.id) {
 			subscribed.recv_unsubscribe()?;
+		}
+
+		Ok(())
+	}
+
+	fn recv_throttle(&mut self, _msg: message::Throttle) -> Result<(), SessionError> {
+		// Path to bash script
+		let script_path = Path::new("tc_scripts/throttle.sh");
+
+		// Run the bash script
+		Self::run_script(script_path, &[])?;
+
+		Ok(())
+	}
+
+	fn recv_packet_loss(&mut self, msg: message::PacketLoss) -> Result<(), SessionError> {
+		// Path to bash script
+		let script_path = Path::new("tc_scripts/packet_loss.sh");
+
+		let loss_rate = msg.loss_rate.to_string();
+
+		// Run the bash script with the loss rate argument
+		Self::run_script(script_path, &[&loss_rate])?;
+
+		Ok(())
+	}
+
+	fn recv_tc_reset(&mut self, _msg: message::TcReset) -> Result<(), SessionError> {
+		// Path to bash script
+		let script_path = Path::new("tc_scripts/reset.sh");
+
+		// Run the bash script
+		Self::run_script(script_path, &[])?;
+
+		Ok(())
+	}
+
+	fn run_script(script_path: &Path, args: &[&str]) -> Result<(), SessionError> {
+		let output = Command::new("bash")
+			.arg(script_path)
+			.args(args)
+			.output();
+
+		match output {
+			Ok(output) => {
+				if !output.status.success() {
+					eprintln!("Script failed with status: {}", output.status);
+					eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+					return Err(SessionError::ScriptError);
+				}
+				println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+			}
+			Err(e) => {
+				eprintln!("Failed to execute script: {}", e);
+				return Err(SessionError::ScriptExecutionError(e.to_string()));
+			}
 		}
 
 		Ok(())

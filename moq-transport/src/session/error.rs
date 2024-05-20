@@ -45,6 +45,12 @@ pub enum SessionError {
 
 	#[error("wrong size")]
 	WrongSize,
+
+	#[error("script error")]
+    ScriptError,
+
+    #[error("script execution error: {0}")]
+    ScriptExecutionError(String),
 }
 
 impl SessionError {
@@ -64,6 +70,8 @@ impl SessionError {
 			Self::Internal => 500,
 			Self::WrongSize => 400,
 			Self::Serve(err) => err.code(),
+			Self::ScriptError => 500,
+            Self::ScriptExecutionError(_) => 500,
 		}
 	}
 }

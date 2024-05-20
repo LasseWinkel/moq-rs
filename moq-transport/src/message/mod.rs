@@ -18,6 +18,9 @@
 //! - [Unsubscribe]
 //! - [AnnounceOk]
 //! - [AnnounceError]
+//! - [Throttle]
+//! - [PacketLoss]
+//! - [TcReset]
 //!
 //! Example flow:
 //! ```test
@@ -44,6 +47,9 @@ mod subscribe_ok;
 mod subscriber;
 mod unannounce;
 mod unsubscribe;
+mod throttle;
+mod packet_loss;
+mod tc_reset;
 
 pub use announce::*;
 pub use announce_cancel::*;
@@ -58,6 +64,9 @@ pub use subscribe_ok::*;
 pub use subscriber::*;
 pub use unannounce::*;
 pub use unsubscribe::*;
+pub use throttle::*;
+pub use packet_loss::*;
+pub use tc_reset::*;
 
 use crate::coding::{Decode, DecodeError, Encode, EncodeError};
 use std::fmt;
@@ -160,4 +169,13 @@ message_types! {
 
 	// Misc
 	GoAway = 0x10,
+
+	// Throttle
+	Throttle = 0x11,
+
+	// Packet Loss
+	PacketLoss = 0x13,
+
+	// Reset tc/netem
+	TcReset = 0x12,
 }

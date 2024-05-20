@@ -50,4 +50,7 @@ subscriber_msgs! {
 	AnnounceCancel,
 	Subscribe,
 	Unsubscribe,
+	Throttle,
+	PacketLoss,
+	TcReset,
 }
