@@ -188,12 +188,15 @@ impl Publisher {
 		Ok(())
 	}
 
-	fn recv_throttle(&mut self, _msg: message::Throttle) -> Result<(), SessionError> {
+	fn recv_throttle(&mut self, msg: message::Throttle) -> Result<(), SessionError> {
 		// Path to bash script
 		let script_path = Path::new("tc_scripts/throttle.sh");
 
+		let loss_rate = msg.loss_rate.to_string();
+		let delay = msg.delay.to_string();
+
 		// Run the bash script
-		Self::run_script(script_path, &[])?;
+		Self::run_script(script_path, &[&loss_rate, &delay])?;
 
 		Ok(())
 	}
