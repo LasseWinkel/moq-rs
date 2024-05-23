@@ -8,13 +8,17 @@ pub struct Throttle {
 
 	// The packet delay.
 	pub delay: u64,
+
+	// The bandwidth limit.
+	pub bandwidth_limit: String,
 }
 
 impl Decode for Throttle {
 	fn decode<R: bytes::Buf>(r: &mut R) -> Result<Self, DecodeError> {
 		let loss_rate: u64 = u64::decode(r)?;
 		let delay: u64 = u64::decode(r)?;
-		Ok(Self { loss_rate, delay })
+		let bandwidth_limit: String = String::decode(r)?;
+		Ok(Self { loss_rate, delay, bandwidth_limit })
 	}
 }
 
@@ -22,6 +26,7 @@ impl Encode for Throttle {
 	fn encode<W: bytes::BufMut>(&self, w: &mut W) -> Result<(), EncodeError> {
 		self.loss_rate.encode(w)?;
 		self.delay.encode(w)?;
+		self.bandwidth_limit.encode(w)?;
 		Ok(())
 	}
 }

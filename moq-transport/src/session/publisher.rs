@@ -194,9 +194,10 @@ impl Publisher {
 
 		let loss_rate = msg.loss_rate.to_string();
 		let delay = msg.delay.to_string();
+		let bandwidth_limit = msg.bandwidth_limit;
 
 		// Run the bash script
-		Self::run_script(script_path, &[&loss_rate, &delay])?;
+		Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit])?;
 
 		Ok(())
 	}
