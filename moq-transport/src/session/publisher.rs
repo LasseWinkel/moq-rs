@@ -195,9 +195,10 @@ impl Publisher {
 		let loss_rate = msg.loss_rate.to_string();
 		let delay = msg.delay.to_string();
 		let bandwidth_limit = msg.bandwidth_limit;
+		let network_namespace = msg.network_namespace;
 
 		// Run the bash script
-		Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit])?;
+		Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit, &network_namespace])?;
 
 		Ok(())
 	}
@@ -214,12 +215,14 @@ impl Publisher {
 		Ok(())
 	}
 
-	fn recv_tc_reset(&mut self, _msg: message::TcReset) -> Result<(), SessionError> {
+	fn recv_tc_reset(&mut self, msg: message::TcReset) -> Result<(), SessionError> {
 		// Path to bash script
 		let script_path = Path::new("tc_scripts/reset.sh");
 
+		let network_namespace = msg.network_namespace;
+
 		// Run the bash script
-		Self::run_script(script_path, &[])?;
+		Self::run_script(script_path, &[&network_namespace])?;
 
 		Ok(())
 	}

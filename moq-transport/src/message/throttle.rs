@@ -11,6 +11,9 @@ pub struct Throttle {
 
 	// The bandwidth limit.
 	pub bandwidth_limit: String,
+
+	// The network namespace.
+	pub network_namespace: String,
 }
 
 impl Decode for Throttle {
@@ -18,7 +21,8 @@ impl Decode for Throttle {
 		let loss_rate: u64 = u64::decode(r)?;
 		let delay: u64 = u64::decode(r)?;
 		let bandwidth_limit: String = String::decode(r)?;
-		Ok(Self { loss_rate, delay, bandwidth_limit })
+		let network_namespace: String = String::decode(r)?;
+		Ok(Self { loss_rate, delay, bandwidth_limit, network_namespace })
 	}
 }
 
@@ -27,6 +31,7 @@ impl Encode for Throttle {
 		self.loss_rate.encode(w)?;
 		self.delay.encode(w)?;
 		self.bandwidth_limit.encode(w)?;
+		self.network_namespace.encode(w)?;
 		Ok(())
 	}
 }
