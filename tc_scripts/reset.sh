@@ -5,6 +5,7 @@ if [ "$NETWORK_NAMESPACE" = "ns-rs" ]; then
 elif [ "$NETWORK_NAMESPACE" = "ns-js" ]; then
     INTERFACE="app-js"
 elif [ "$NETWORK_NAMESPACE" = "ns-js-sub" ]; then
+	NETWORK_NAMESPACE="ns-rs"
     INTERFACE="app-rs-sub"
 fi
 
