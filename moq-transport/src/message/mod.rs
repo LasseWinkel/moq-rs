@@ -12,6 +12,7 @@
 //! - [SubscribeError]
 //! - [SubscribeReset]
 //! - [Object]
+//! - [GetGopSize]
 //!
 //! Messages sent by the subscriber:
 //! - [Subscribe]
@@ -21,6 +22,7 @@
 //! - [Throttle]
 //! - [PacketLoss]
 //! - [TcReset]
+//! - [SetGopSize]
 //!
 //! Example flow:
 //! ```test
@@ -38,35 +40,39 @@ mod announce;
 mod announce_cancel;
 mod announce_error;
 mod announce_ok;
+mod get_gop_size;
 mod go_away;
+mod packet_loss;
 mod publisher;
+mod set_gop_size;
 mod subscribe;
 mod subscribe_done;
 mod subscribe_error;
 mod subscribe_ok;
 mod subscriber;
+mod tc_reset;
+mod throttle;
 mod unannounce;
 mod unsubscribe;
-mod throttle;
-mod packet_loss;
-mod tc_reset;
 
 pub use announce::*;
 pub use announce_cancel::*;
 pub use announce_error::*;
 pub use announce_ok::*;
+pub use get_gop_size::*;
 pub use go_away::*;
+pub use packet_loss::*;
 pub use publisher::*;
+pub use set_gop_size::*;
 pub use subscribe::*;
 pub use subscribe_done::*;
 pub use subscribe_error::*;
 pub use subscribe_ok::*;
 pub use subscriber::*;
+pub use tc_reset::*;
+pub use throttle::*;
 pub use unannounce::*;
 pub use unsubscribe::*;
-pub use throttle::*;
-pub use packet_loss::*;
-pub use tc_reset::*;
 
 use crate::coding::{Decode, DecodeError, Encode, EncodeError};
 use std::fmt;
@@ -173,9 +179,15 @@ message_types! {
 	// Throttle
 	Throttle = 0x11,
 
+	// Reset tc/netem
+	TcReset = 0x12,
+
 	// Packet Loss
 	PacketLoss = 0x13,
 
-	// Reset tc/netem
-	TcReset = 0x12,
+	// Calculate latency
+	GetGopSize = 0x14,
+
+	// Gop size
+	SetGopSize = 0x15,
 }

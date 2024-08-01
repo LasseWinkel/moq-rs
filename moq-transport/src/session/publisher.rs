@@ -1,8 +1,6 @@
 use std::{
 	collections::{hash_map, HashMap},
 	sync::{Arc, Mutex},
-	process::Command,
-	path::Path
 };
 
 use futures::{stream::FuturesUnordered, StreamExt};
@@ -114,6 +112,7 @@ impl Publisher {
 			message::Subscriber::Throttle(msg) => self.recv_throttle(msg),
 			message::Subscriber::PacketLoss(msg) => self.recv_packet_loss(msg),
 			message::Subscriber::TcReset(msg) => self.recv_tc_reset(msg),
+			message::Subscriber::SetGopSize(msg) => Ok({}),
 		};
 
 		if let Err(err) = res {
@@ -228,10 +227,7 @@ impl Publisher {
 	}
 
 	fn run_script(script_path: &Path, args: &[&str]) -> Result<(), SessionError> {
-		let output = Command::new("bash")
-			.arg(script_path)
-			.args(args)
-			.output();
+		let output = Command::new("bash").arg(script_path).args(args).output();
 
 		match output {
 			Ok(output) => {

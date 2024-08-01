@@ -16,6 +16,8 @@ use crate::watch::Queue;
 
 use super::{Announced, AnnouncedRecv, Reader, Session, SessionError, Subscribe, SubscribeRecv};
 
+use crate::session::GOP_SIZE;
+
 // TODO remove Clone.
 #[derive(Clone)]
 pub struct Subscriber {
@@ -83,6 +85,7 @@ impl Subscriber {
 			message::Publisher::SubscribeOk(msg) => self.recv_subscribe_ok(msg),
 			message::Publisher::SubscribeError(msg) => self.recv_subscribe_error(msg),
 			message::Publisher::SubscribeDone(msg) => self.recv_subscribe_done(msg),
+			message::Publisher::GetGopSize(msg) => self.recv_get_gop_size(msg),
 		};
 
 		if let Err(SessionError::Serve(err)) = res {
@@ -140,6 +143,15 @@ impl Subscriber {
 		if let Some(subscribe) = self.subscribes.lock().unwrap().remove(&msg.id) {
 			subscribe.error(ServeError::Closed(msg.code))?;
 		}
+
+		Ok(())
+	}
+
+	fn recv_get_gop_size(&mut self, msg: &message::GetGopSize) -> Result<(), SessionError> {
+		let mut gop_size_mut = GOP_SIZE.lock().unwrap();
+		self.send_message(message::SetGopSize {
+			gop_size: (*gop_size_mut.clone()).to_string(),
+		});
 
 		Ok(())
 	}

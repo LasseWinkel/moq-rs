@@ -53,4 +53,5 @@ subscriber_msgs! {
 	Throttle,
 	PacketLoss,
 	TcReset,
+	SetGopSize,
 }

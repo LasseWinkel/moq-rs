@@ -25,6 +25,14 @@ use crate::message::Message;
 use crate::watch::Queue;
 use crate::{message, setup};
 
+use lazy_static::lazy_static;
+use std::sync::Mutex;
+
+// Define a global mutable variable
+lazy_static! {
+	static ref GOP_SIZE: Mutex<String> = Mutex::new("2".to_string());
+}
+
 #[must_use = "run() must be called"]
 pub struct Session {
 	webtransport: web_transport::Session,
@@ -186,6 +194,14 @@ impl Session {
 		loop {
 			let msg: message::Message = recver.decode().await?;
 			log::debug!("received message: {:?}", msg);
+
+			match &msg {
+				message::Message::SetGopSize(msg) => {
+					let mut gop_size_mut = GOP_SIZE.lock().unwrap();
+					*gop_size_mut = msg.gop_size.clone();
+				}
+				_ => {}
+			}
 
 			let msg = match TryInto::<message::Publisher>::try_into(msg) {
 				Ok(msg) => {
