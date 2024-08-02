@@ -114,7 +114,7 @@ impl Publisher {
 			message::Subscriber::Throttle(msg) => self.recv_throttle(msg),
 			message::Subscriber::PacketLoss(msg) => self.recv_packet_loss(msg),
 			message::Subscriber::TcReset(msg) => self.recv_tc_reset(msg),
-			message::Subscriber::SetGopSize(msg) => Ok({}),
+			message::Subscriber::SetServerStoredMetrics(_msg) => Ok({}),
 		};
 
 		if let Err(err) = res {

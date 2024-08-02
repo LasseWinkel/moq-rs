@@ -12,7 +12,7 @@
 //! - [SubscribeError]
 //! - [SubscribeReset]
 //! - [Object]
-//! - [GetGopSize]
+//! - [GetServerStoredMetrics]
 //!
 //! Messages sent by the subscriber:
 //! - [Subscribe]
@@ -22,7 +22,7 @@
 //! - [Throttle]
 //! - [PacketLoss]
 //! - [TcReset]
-//! - [SetGopSize]
+//! - [SetServerStoredMetrics]
 //!
 //! Example flow:
 //! ```test
@@ -40,11 +40,11 @@ mod announce;
 mod announce_cancel;
 mod announce_error;
 mod announce_ok;
-mod get_gop_size;
+mod get_server_stored_metrics;
 mod go_away;
 mod packet_loss;
 mod publisher;
-mod set_gop_size;
+mod set_server_stored_metrics;
 mod subscribe;
 mod subscribe_done;
 mod subscribe_error;
@@ -59,11 +59,11 @@ pub use announce::*;
 pub use announce_cancel::*;
 pub use announce_error::*;
 pub use announce_ok::*;
-pub use get_gop_size::*;
+pub use get_server_stored_metrics::*;
 pub use go_away::*;
 pub use packet_loss::*;
 pub use publisher::*;
-pub use set_gop_size::*;
+pub use set_server_stored_metrics::*;
 pub use subscribe::*;
 pub use subscribe_done::*;
 pub use subscribe_error::*;
@@ -185,9 +185,9 @@ message_types! {
 	// Packet Loss
 	PacketLoss = 0x13,
 
-	// Calculate latency
-	GetGopSize = 0x14,
+	// Get server stored metrics
+	GetServerStoredMetrics = 0x14,
 
-	// Gop size
-	SetGopSize = 0x15,
+	// Set server stored metrics
+	SetServerStoredMetrics = 0x15,
 }

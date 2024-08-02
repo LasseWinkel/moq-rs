@@ -50,5 +50,5 @@ publisher_msgs! {
 	SubscribeOk,
 	SubscribeError,
 	SubscribeDone,
-	GetGopSize,
+	GetServerStoredMetrics,
 }

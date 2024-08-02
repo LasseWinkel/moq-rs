@@ -28,9 +28,11 @@ use crate::{message, setup};
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
-// Define a global mutable variable
+// Define global mutable variables
 lazy_static! {
 	static ref GOP_SIZE: Mutex<String> = Mutex::new("2".to_string());
+	static ref BITRATE_MODE: Mutex<String> = Mutex::new("Constant".to_string());
+	static ref BITRATE: Mutex<u64> = Mutex::new(6_000_000);
 }
 
 #[must_use = "run() must be called"]
@@ -196,9 +198,13 @@ impl Session {
 			log::debug!("received message: {:?}", msg);
 
 			match &msg {
-				message::Message::SetGopSize(msg) => {
+				message::Message::SetServerStoredMetrics(msg) => {
 					let mut gop_size_mut = GOP_SIZE.lock().unwrap();
 					*gop_size_mut = msg.gop_size.clone();
+					let mut bitrate_mode_mut = BITRATE_MODE.lock().unwrap();
+					*bitrate_mode_mut = msg.bitrate_mode.clone();
+					let mut bitrate_mut = BITRATE.lock().unwrap();
+					*bitrate_mut = msg.bitrate.clone();
 				}
 				_ => {}
 			}
