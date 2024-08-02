@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Generate a new RSA key/cert for local development
-HOST="localhost"
+HOST="12.0.0.1"
 CRT="$HOST.crt"
 KEY="$HOST.key"
 
@@ -12,7 +12,7 @@ KEY="$HOST.key"
 # NOTE: The ecdsa flag does nothing but I wish it did
 go run filippo.io/mkcert -ecdsa -install
 
-# Generate a new certificate for localhost
+# Generate a new certificate for 12.0.0.1
 # This fork of mkcert supports the -days flag.
 # TODO remove the -days flag when Chrome accepts self-signed certs.
-go run filippo.io/mkcert -ecdsa -days 10 -cert-file "$CRT" -key-file "$KEY" localhost 127.0.0.1 ::1
+go run filippo.io/mkcert -ecdsa -days 10 -cert-file "$CRT" -key-file "$KEY" 12.0.0.1 127.0.0.1 ::1

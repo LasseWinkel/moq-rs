@@ -12,10 +12,10 @@ export RUST_LOG="${RUST_LOG:-debug}"
 
 # Default to a self-signed certificate
 # TODO automatically generate if it doesn't exist.
-CERT="${CERT:-dev/localhost.crt}"
-KEY="${KEY:-dev/localhost.key}"
+CERT="${CERT:-dev/12.0.0.1.crt}"
+KEY="${KEY:-dev/12.0.0.1.key}"
 
-# Default to listening on localhost:4443
+# Default to listening on 12.0.0.1:4443
 PORT="${PORT:-4443}"
 BIND="${BIND:-[::]:$PORT}"
 
@@ -33,7 +33,7 @@ if [ -n "${HOST-}" ]; then
 	ARGS="$ARGS --host $HOST"
 fi
 
-echo "Publish URL: https://quic.video/publish/?server=localhost:$PORT"
+echo "Publish URL: https://quic.video/publish/?server=12.0.0.1:$PORT"
 
 # Run the relay and forward any arguments
 cargo run --bin moq-relay -- --bind "$BIND" --tls-cert "$CERT" --tls-key "$KEY" --dev $ARGS -- "$@"

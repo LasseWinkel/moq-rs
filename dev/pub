@@ -22,7 +22,7 @@ fi
 export RUST_LOG="${RUST_LOG:-debug}"
 
 # Connect to localhost by default.
-HOST="${HOST:-localhost}"
+HOST="${HOST:-12.0.0.1}"
 PORT="${PORT:-4443}"
 ADDR="${ADDR:-$HOST:$PORT}"
 SCHEME="${SCHEME:-https}"
@@ -34,7 +34,7 @@ NAME="${NAME:-bbb}"
 URL="${URL:-"$SCHEME://$ADDR"}"
 
 # Default to a source video
-INPUT="${INPUT:-/dev/video0}"
+INPUT="${INPUT:-dev/bbb.mp4}"
 
 # Print out the watch URL
 echo "Watch URL: https://quic.video/watch/$NAME?server=$ADDR"
@@ -43,11 +43,29 @@ echo "Watch URL: https://quic.video/watch/$NAME?server=$ADDR"
 ffmpeg -hide_banner \
 	-stream_loop -1 -re \
 	-i "$INPUT" \
-	-c copy \
+	-c copy -an \
 	-f mp4 -movflags cmaf+separate_moof+delay_moov+skip_trailer+frag_every_frame \
-	-c:v libx264 \
 	-tune zerolatency \
+	-preset ultrafast \
 	- | cargo run --bin moq-pub -- --name "$NAME" "$URL" "$@"
 
-	# -vf "drawtext=fontsize=42:fontcolor=red:text='%{localtime\:%X.%N}      %{pts\:hms}     %{frame_num}':x=20:y=20" \
-	# -metadata:s:v:0 "key1=value1:key2=value2" \
+# ffmpeg -hide_banner -stream_loop -1 -re -i "$INPUT" -an -f mp4 -movflags cmaf+separate_moof+delay_moov+skip_trailer+frag_every_frame - | cargo run --bin moq-pub -- --name "$NAME" "$URL" "$@"
+
+# -vf "drawtext=fontsize=42:fontcolor=red:text='%{localtime\:%X.%N}      %{pts\:hms}     %{frame_num}':x=20:y=20" \
+# -metadata:s:v:0 "key1=value1:key2=value2" \
+
+# ${FF} \
+# -hide_banner \
+# -framerate ${INPUT_FPS} \
+# -i ${INPUT} \
+# -c:v ${VCODEC} -b:v 6000K -s:v 1920x1080 \
+# -use_timeline 0 \
+# -utc_timing_url "http://time.akamai.com" \
+# -format_options "movflags=cmaf" \
+# -frag_type duration \
+# -adaptation_sets "id=0,seg_duration=100,frag_duration=0.033,streams=0" \
+# -g:v 60 -keyint_min:v 60 -sc_threshold:v 0 -streaming 1 -ldash 1 -tune zerolatency \
+# -preset ultrafast \
+# -target_latency ${TARGET_LATENCY} \
+# -f dash \
+# ${PROTO}://${SERVER}:${PORT}/${ID}/${ID}.mpd \
