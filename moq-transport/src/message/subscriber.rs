@@ -51,7 +51,6 @@ subscriber_msgs! {
 	Subscribe,
 	Unsubscribe,
 	Throttle,
-	PacketLoss,
 	TcReset,
 	SetServerStoredMetrics,
 }

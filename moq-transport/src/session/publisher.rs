@@ -112,7 +112,6 @@ impl Publisher {
 			message::Subscriber::Subscribe(msg) => self.recv_subscribe(msg),
 			message::Subscriber::Unsubscribe(msg) => self.recv_unsubscribe(msg),
 			message::Subscriber::Throttle(msg) => self.recv_throttle(msg),
-			message::Subscriber::PacketLoss(msg) => self.recv_packet_loss(msg),
 			message::Subscriber::TcReset(msg) => self.recv_tc_reset(msg),
 			message::Subscriber::SetServerStoredMetrics(_msg) => Ok({}),
 		};
@@ -200,18 +199,6 @@ impl Publisher {
 
 		// Run the bash script
 		Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit, &network_namespace])?;
-
-		Ok(())
-	}
-
-	fn recv_packet_loss(&mut self, msg: message::PacketLoss) -> Result<(), SessionError> {
-		// Path to bash script
-		let script_path = Path::new("tc_scripts/packet_loss.sh");
-
-		let loss_rate = msg.loss_rate.to_string();
-
-		// Run the bash script with the loss rate argument
-		Self::run_script(script_path, &[&loss_rate])?;
 
 		Ok(())
 	}

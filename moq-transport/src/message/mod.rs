@@ -20,7 +20,6 @@
 //! - [AnnounceOk]
 //! - [AnnounceError]
 //! - [Throttle]
-//! - [PacketLoss]
 //! - [TcReset]
 //! - [SetServerStoredMetrics]
 //!
@@ -42,7 +41,6 @@ mod announce_error;
 mod announce_ok;
 mod get_server_stored_metrics;
 mod go_away;
-mod packet_loss;
 mod publisher;
 mod set_server_stored_metrics;
 mod subscribe;
@@ -61,7 +59,6 @@ pub use announce_error::*;
 pub use announce_ok::*;
 pub use get_server_stored_metrics::*;
 pub use go_away::*;
-pub use packet_loss::*;
 pub use publisher::*;
 pub use set_server_stored_metrics::*;
 pub use subscribe::*;
@@ -181,9 +178,6 @@ message_types! {
 
 	// Reset tc/netem
 	TcReset = 0x12,
-
-	// Packet Loss
-	PacketLoss = 0x13,
 
 	// Get server stored metrics
 	GetServerStoredMetrics = 0x14,
