@@ -1,11 +1,14 @@
 use anyhow::{self, Context};
 use bytes::{Buf, Bytes};
 use moq_transport::serve::{GroupWriter, GroupsWriter, TrackWriter, TracksWriter};
+// use moq_transport::session::SessionError;
 use mp4::{self, ReadBox, TrackType};
 use serde_json::json;
 use std::cmp::max;
 use std::collections::HashMap;
 use std::io::Cursor;
+// use std::path::Path;
+// use std::process::Command;
 use std::time;
 
 pub struct Media {
@@ -276,6 +279,10 @@ fn next_atom<B: Buf>(buf: &mut B) -> anyhow::Result<Option<Bytes>> {
 		return Ok(None);
 	}
 
+	/* if size != 104 && size != 108 {
+		println!("{}", size - 8);
+	} */
+
 	let atom = buf.copy_to_bytes(size);
 
 	Ok(Some(atom))
@@ -365,11 +372,33 @@ impl Fragment {
 		anyhow::ensure!(moof.trafs.len() == 1, "multiple tracks per moof atom");
 		let track = moof.trafs[0].tfhd.track_id;
 
+		// print!("{}  ", moof.mfhd.sequence_number);
+
+		/* let script_path = Path::new("tc_scripts/throttle.sh");
+
+		if moof.mfhd.sequence_number == 601 {
+			let loss_rate = "1";
+			let delay = "500";
+			let bandwidth_limit = "100";
+			let network_namespace = "ns-js-sub";
+			Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit, &network_namespace])?;
+		}
+
+		if moof.mfhd.sequence_number == 841 {
+			let loss_rate = "0";
+			let delay = "500";
+			let bandwidth_limit = "100";
+			let network_namespace = "ns-js-sub";
+			Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit, &network_namespace])?;
+		} */
+
 		// Parse the moof to get some timing information to sleep.
 		let timestamp = sample_timestamp(&moof).expect("couldn't find timestamp");
 
 		// Detect if we should start a new segment.
 		let keyframe = sample_keyframe(&moof);
+
+		// print!("{}  ", keyframe);
 
 		Ok(Self {
 			track,
@@ -382,6 +411,27 @@ impl Fragment {
 	fn timestamp(&self, timescale: u64) -> time::Duration {
 		time::Duration::from_millis(1000 * self.timestamp / timescale)
 	}
+
+	/* fn run_script(script_path: &Path, args: &[&str]) -> Result<(), SessionError> {
+		let output = Command::new("bash").arg(script_path).args(args).output();
+
+		match output {
+			Ok(output) => {
+				if !output.status.success() {
+					eprintln!("Script failed with status: {}", output.status);
+					eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+					return Err(SessionError::ScriptError);
+				}
+				println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+			}
+			Err(e) => {
+				eprintln!("Failed to execute script: {}", e);
+				return Err(SessionError::ScriptExecutionError(e.to_string()));
+			}
+		}
+
+		Ok(())
+	} */
 }
 
 fn sample_timestamp(moof: &mp4::MoofBox) -> Option<u64> {
