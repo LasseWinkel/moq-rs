@@ -21,9 +21,16 @@ fi
 # Use debug logging by default
 export RUST_LOG="${RUST_LOG:-debug}"
 
+# Path to the JSON file
+config_file="config.json"
+
+# Read values from JSON file using jq
+IP_ADDRESS=$(jq -r '.serverIpAddress' "$config_file")
+SERVER_PORT=$(jq -r '.serverPort' "$config_file")
+
 # Connect to localhost by default.
-HOST="${HOST:-12.0.0.1}"
-PORT="${PORT:-4443}"
+HOST="${HOST:-$IP_ADDRESS}"
+PORT="${PORT:-$SERVER_PORT}"
 ADDR="${ADDR:-$HOST:$PORT}"
 SCHEME="${SCHEME:-https}"
 

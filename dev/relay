@@ -10,13 +10,20 @@ cd "$(dirname "$0")/.."
 # Use debug logging by default
 export RUST_LOG="${RUST_LOG:-debug}"
 
+# Path to the JSON file
+config_file="config.json"
+
+# Read values from JSON file using jq
+IP_ADDRESS=$(jq -r '.serverIpAddress' "$config_file")
+SERVER_PORT=$(jq -r '.serverPort' "$config_file")
+
 # Default to a self-signed certificate
 # TODO automatically generate if it doesn't exist.
-CERT="${CERT:-dev/12.0.0.1.crt}"
-KEY="${KEY:-dev/12.0.0.1.key}"
+CERT="${CERT:-dev/$IP_ADDRESS.crt}"
+KEY="${KEY:-dev/$IP_ADDRESS.key}"
 
-# Default to listening on 12.0.0.1:4443
-PORT="${PORT:-4443}"
+# Default to listening on localhost:4443
+PORT="${PORT:-$SERVER_PORT}"
 BIND="${BIND:-[::]:$PORT}"
 
 # A list of optional args
@@ -33,7 +40,7 @@ if [ -n "${HOST-}" ]; then
 	ARGS="$ARGS --host $HOST"
 fi
 
-echo "Publish URL: https://quic.video/publish/?server=12.0.0.1:$PORT"
+echo "Publish URL: https://quic.video/publish/?server=$IP_ADDRESS:$PORT"
 
 # Run the relay and forward any arguments
 cargo run --bin moq-relay -- --bind "$BIND" --tls-cert "$CERT" --tls-key "$KEY" --dev $ARGS -- "$@"

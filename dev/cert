@@ -3,8 +3,14 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+# Path to the JSON file
+config_file="../config.json"
+
+# Read values from JSON file using jq
+IP_ADDRESS=$(jq -r '.serverIpAddress' "$config_file")
+
 # Generate a new RSA key/cert for local development
-HOST="12.0.0.1"
+HOST=$IP_ADDRESS
 CRT="$HOST.crt"
 KEY="$HOST.key"
 
@@ -12,7 +18,7 @@ KEY="$HOST.key"
 # NOTE: The ecdsa flag does nothing but I wish it did
 go run filippo.io/mkcert -ecdsa -install
 
-# Generate a new certificate for 12.0.0.1
+# Generate a new certificate for host
 # This fork of mkcert supports the -days flag.
 # TODO remove the -days flag when Chrome accepts self-signed certs.
-go run filippo.io/mkcert -ecdsa -days 10 -cert-file "$CRT" -key-file "$KEY" 12.0.0.1 127.0.0.1 ::1
+go run filippo.io/mkcert -ecdsa -days 10 -cert-file "$CRT" -key-file "$KEY" $IP_ADDRESS 127.0.0.1 ::1
