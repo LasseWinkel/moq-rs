@@ -1,5 +1,5 @@
 # Path to the JSON file
-config_file="../config.json"
+config_file="config.json"
 
 # Read values from JSON file using jq
 NETWORK_INTERFACE_PUBLISHER=$(jq -r '.networkInterfacePublisher' "$config_file")
