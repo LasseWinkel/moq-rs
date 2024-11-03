@@ -1,0 +1,3 @@
+file 'bbb-merge-trimmed-0-600-gop-48.mp4'
+file 'bbb-merge-trimmed-601-840-gop-12.mp4'
+file 'bbb-merge-trimmed-841-1440-gop-48.mp4'
