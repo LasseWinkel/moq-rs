@@ -41,7 +41,7 @@ NAME="${NAME:-bbb}"
 URL="${URL:-"$SCHEME://$ADDR"}"
 
 # Default to a source video
-INPUT="${INPUT:-dev/bbb.mp4}"
+INPUT="${INPUT:-dev/frankenstein.mp4}"
 
 # Print out the watch URL
 echo "Watch URL: https://quic.video/watch/$NAME?server=$ADDR"

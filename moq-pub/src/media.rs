@@ -1,14 +1,14 @@
 use anyhow::{self, Context};
 use bytes::{Buf, Bytes};
 use moq_transport::serve::{GroupWriter, GroupsWriter, TrackWriter, TracksWriter};
-// use moq_transport::session::SessionError;
+use moq_transport::session::SessionError;
 use mp4::{self, ReadBox, TrackType};
 use serde_json::json;
 use std::cmp::max;
 use std::collections::HashMap;
 use std::io::Cursor;
-// use std::path::Path;
-// use std::process::Command;
+use std::path::Path;
+use std::process::Command;
 use std::time;
 
 pub struct Media {
@@ -279,9 +279,9 @@ fn next_atom<B: Buf>(buf: &mut B) -> anyhow::Result<Option<Bytes>> {
 		return Ok(None);
 	}
 
-	/* if size != 104 && size != 108 {
-		println!("{}", size - 8);
-	} */
+	if size != 104 && size != 108 && size != 112 {
+		// println!("{}", size - 8);
+	}
 
 	let atom = buf.copy_to_bytes(size);
 
@@ -374,9 +374,9 @@ impl Fragment {
 
 		// print!("{}  ", moof.mfhd.sequence_number);
 
-		/* let script_path = Path::new("tc_scripts/throttle.sh");
+		let script_path = Path::new("tc_scripts/throttle.sh");
 
-		if moof.mfhd.sequence_number == 601 {
+		if moof.mfhd.sequence_number == 481 {
 			let loss_rate = "1";
 			let delay = "500";
 			let bandwidth_limit = "100";
@@ -384,13 +384,17 @@ impl Fragment {
 			Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit, &network_namespace])?;
 		}
 
-		if moof.mfhd.sequence_number == 841 {
+		if moof.mfhd.sequence_number == 721 {
 			let loss_rate = "0";
 			let delay = "500";
 			let bandwidth_limit = "100";
 			let network_namespace = "ns-js-sub";
 			Self::run_script(script_path, &[&loss_rate, &delay, &bandwidth_limit, &network_namespace])?;
-		} */
+		}
+
+		if moof.mfhd.sequence_number == 961 {
+			println!("ENDE {}\n\n", moof.mfhd.sequence_number);
+		}
 
 		// Parse the moof to get some timing information to sleep.
 		let timestamp = sample_timestamp(&moof).expect("couldn't find timestamp");
@@ -412,7 +416,7 @@ impl Fragment {
 		time::Duration::from_millis(1000 * self.timestamp / timescale)
 	}
 
-	/* fn run_script(script_path: &Path, args: &[&str]) -> Result<(), SessionError> {
+	fn run_script(script_path: &Path, args: &[&str]) -> Result<(), SessionError> {
 		let output = Command::new("bash").arg(script_path).args(args).output();
 
 		match output {
@@ -431,7 +435,7 @@ impl Fragment {
 		}
 
 		Ok(())
-	} */
+	}
 }
 
 fn sample_timestamp(moof: &mp4::MoofBox) -> Option<u64> {
